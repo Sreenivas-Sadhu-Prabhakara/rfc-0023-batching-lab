@@ -1,0 +1,11 @@
+{
+  "ack_delay": 4,
+  "max_bytes": 7,
+  "arrivals": [
+    {"tick": 0, "hex": "00 12"},
+    {"tick": 1, "hex": "02 12 34"},
+    {"tick": 2, "hex": "06 34"},
+    {"tick": 2, "hex": "08 34"},
+    {"tick": 5, "hex": "07 34"}
+  ]
+}

@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RFC 23 · Control message batching</title>
+<style>
+:root { background: #eef4f3; color: #132e34; font: 17px/1.55 system-ui, sans-serif; }
+main { max-width: 900px; margin: auto; padding: 36px 22px; }
+h1 { font-size: clamp(2rem, 6vw, 3.4rem); line-height: 1.08; margin: .25em 0; }
+h2 { margin: 1.15em 0 .35em; }
+a { color: #115e67; }
+.table { overflow-x: auto; background: white; border: 1px solid #a5c0bb; border-radius: 10px; }
+table { text-align: left; width: 100%; border-collapse: collapse; }
+th, td { padding: 7px 12px; border-top: 1px solid #d5e4e1; vertical-align: top; }
+thead { background: #dbece8; }
+</style></head>
+<body><main>
+<h1>RFC 23 · Control message batching</h1>
+<p>5 commands, 4 ticks until the link is ready again, and a 7-byte payload limit. Both policies send as soon as the link is ready.</p>
+<div class="table" role="region" aria-label="Policy comparison" tabindex="0"><table>
+<thead><tr><th scope="col">Policy</th><th scope="col">Sends</th><th scope="col">Final ready tick</th><th scope="col">Longest queue wait</th></tr></thead>
+<tbody><tr><th scope="row">One command per send</th><td>5</td><td>20</td><td>11 ticks</td></tr><tr><th scope="row">Batch on readiness</th><td>3</td><td>12</td><td>3 ticks</td></tr></tbody>
+</table></div>
+
+<h2>One command per send</h2>
+<div class="table" role="region" aria-label="One command per send transmissions" tabindex="0"><table>
+<thead><tr><th scope="col">Send tick</th><th scope="col">Ready tick</th><th scope="col">Payload hex</th><th scope="col">Commands decoded in order</th></tr></thead>
+<tbody><tr><th scope="row">0</th><td>4</td><td><code>00 12</code></td><td>Open primary</td></tr><tr><th scope="row">4</th><td>8</td><td><code>02 12 34</code></td><td>Accept primary</td></tr><tr><th scope="row">8</th><td>12</td><td><code>06 34</code></td><td>CEASE</td></tr><tr><th scope="row">12</th><td>16</td><td><code>08 34</code></td><td>UNCEASE</td></tr><tr><th scope="row">16</th><td>20</td><td><code>07 34</code></td><td>CLOSING</td></tr></tbody>
+</table></div>
+<h2>Batch on readiness</h2>
+<div class="table" role="region" aria-label="Batch on readiness transmissions" tabindex="0"><table>
+<thead><tr><th scope="col">Send tick</th><th scope="col">Ready tick</th><th scope="col">Payload hex</th><th scope="col">Commands decoded in order</th></tr></thead>
+<tbody><tr><th scope="row">0</th><td>4</td><td><code>00 12</code></td><td>Open primary</td></tr><tr><th scope="row">4</th><td>8</td><td><code>02 12 34 06 34 08 34</code></td><td>Accept primary · CEASE · UNCEASE</td></tr><tr><th scope="row">8</th><td>12</td><td><code>07 34</code></td><td>CLOSING</td></tr></tbody>
+</table></div>
+<p>The local Go simulator generated this saved report. <a href="https://www.rfc-editor.org/info/rfc23/">Official RFC 23</a> · <a href="https://github.com/Sreenivas-Sadhu-Prabhakara/rfc-0023-batching-lab">Source and run instructions</a></p>
+</main></body></html>
